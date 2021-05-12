@@ -10,8 +10,6 @@
 # ------------------------------------------------------
 
 import argparse
-import tensorflow as tf
-import time
 import sys
 import time
 
@@ -24,7 +22,7 @@ import tensorflow as tf
 # Global variables
 # ------------------------------------------------------
 
-k_value_tf = tf.constant(3)
+k_value_tf = None
 
 
 # ------------------------------------------------------
@@ -68,11 +66,10 @@ def create_data_points():
 # def create_test_point_to_classify()
 # ------------------------------------------------------
 
-def create_test_point_to_classify():
+def create_test_point_to_classify(datapoint_x, datapoint_y):
     print('-- Creating a test point to classify')
 
-    data_point = np.array([((np.random.random_sample() * 10) - 5), ((np.random.random_sample() * 10) - 3)])
-
+    data_point = np.array([datapoint_x, datapoint_y])
     data_point_tf = tf.constant(data_point)
 
     return data_point, data_point_tf
@@ -148,7 +145,7 @@ def plot_results(x0, x1, data_point, class_value):
 # def main()
 # ------------------------------------------------------
 
-def main(datapoint_x, datapoint_y, k_neighbors):
+def main(datapoint_x, datapoint_y):
     # ------------------------------------------------------
     # -- Start of script run actions
     # ------------------------------------------------------
@@ -172,7 +169,7 @@ def main(datapoint_x, datapoint_y, k_neighbors):
     # ------------------------------------------------------
 
     (x0, class_value0, x1, class_value1) = create_data_points()
-    (data_point, data_point_tf) = create_test_point_to_classify()
+    (data_point, data_point_tf) = create_test_point_to_classify(datapoint_x, datapoint_y)
 
     x = np.vstack((x0, x1))
     class_value = np.hstack((class_value0, class_value1))
@@ -222,6 +219,7 @@ def main(datapoint_x, datapoint_y, k_neighbors):
 # ------------------------------------------------------
 
 def require_input():
+    """Prompts the user for input."""
     x = input("x = ")
     y = input("y = ")
     k = input("k = ")
@@ -229,6 +227,9 @@ def require_input():
 
 
 def print_menu():
+    """Prints a menu for the user to choose the values of the test data point, as
+    well as set the amount of nearest neighbors."""
+
     print("Welcome to the kNN algorithm, this algorithm will \n" +
           "calculate the k nearest neighbors of the coordinates you'll\n" +
           "enter in the next step. The x represents the x coordinate, the y represents, \n" +
@@ -245,7 +246,7 @@ def print_menu():
             x = float(x)
             y = float(y)
             k = int(k)
-        except:
+        except ValueError:
             print("Unable to read the numbers you entered, please try again or enter C to cancel:")
             x, y, k = require_input()
     return x, y, k
@@ -262,15 +263,18 @@ if __name__ == '__main__':
     for arg in vars(args):
         argCnt += 0 if getattr(args, arg) is None else 1
 
-    if (argCnt == 0):
-        datapoint_x, datapoint_y, k_neighbors = print_menu()
+    if argCnt != 3:
+        input_datapoint_x, input_datapoint_y, input_k_neighbors = print_menu()
     else:
-        datapoint_x = args.x
-        datapoint_y = args.y
-        datapoint_k = args.k
+        input_datapoint_x = args.x
+        input_datapoint_y = args.y
+        input_k_neighbors = args.k
 
-    main(datapoint_x=datapoint_x, datapoint_y=datapoint_y, k_neighbors=k_neighbors)
-    print("done")
+    if input_k_neighbors < 1:
+        sys.exit("k must be > 0")
+
+    k_value_tf = tf.constant(input_k_neighbors)
+    main(datapoint_x=input_datapoint_x, datapoint_y=input_datapoint_y)
 
 # ------------------------------------------------------------------
 # End of script
