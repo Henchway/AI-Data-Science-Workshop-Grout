@@ -9,6 +9,9 @@
 # Modules to import
 # ------------------------------------------------------
 
+import argparse
+import tensorflow as tf
+import time
 import sys
 import time
 
@@ -249,8 +252,25 @@ def print_menu():
 
 
 if __name__ == '__main__':
-    datapoint_x, datapoint_y, k_neighbors = print_menu()
+    argsParser = argparse.ArgumentParser(description='k-nearest neighbours with tensorflow')
+    argsParser.add_argument("-x", metavar='<float>', type=float, required=False, help="The x value of x*a+y=z")
+    argsParser.add_argument("-y", metavar='<float>', type=float, required=False, help="The y value of x*a+y=z")
+    argsParser.add_argument("-k", metavar='<integer>', type=int, required=False, help="Amount of neighbors to check.")
+    args = argsParser.parse_args()
+
+    argCnt = 0
+    for arg in vars(args):
+        argCnt += 0 if getattr(args, arg) is None else 1
+
+    if (argCnt == 0):
+        datapoint_x, datapoint_y, k_neighbors = print_menu()
+    else:
+        datapoint_x = args.x
+        datapoint_y = args.y
+        datapoint_k = args.k
+
     main(datapoint_x=datapoint_x, datapoint_y=datapoint_y, k_neighbors=k_neighbors)
+    print("done")
 
 # ------------------------------------------------------------------
 # End of script
