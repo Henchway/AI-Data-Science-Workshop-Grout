@@ -9,12 +9,13 @@
 # Modules to import
 # ------------------------------------------------------
 
-import tensorflow as tf
-import time
 import sys
+import time
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+import tensorflow as tf
 
 # ------------------------------------------------------
 # Global variables
@@ -36,7 +37,6 @@ k_value_tf = tf.constant(3)
 # ------------------------------------------------------
 
 def create_data_points():
-
     print('-- Creating the data points')
 
     # Cluster 0 data points (x0) / Class 0 label (class_value0 = 0)
@@ -66,7 +66,6 @@ def create_data_points():
 # ------------------------------------------------------
 
 def create_test_point_to_classify():
-
     print('-- Creating a test point to classify')
 
     data_point = np.array([((np.random.random_sample() * 10) - 5), ((np.random.random_sample() * 10) - 3)])
@@ -81,7 +80,6 @@ def create_test_point_to_classify():
 # -------------------------------------------------------------------
 
 def get_label(preds):
-
     print('-- Obtaining the class label')
 
     counts = tf.math.bincount(tf.dtypes.cast(preds, tf.int32))
@@ -99,7 +97,6 @@ def get_label(preds):
 # -------------------------------------------------------------------
 
 def predict_class(xt, ct, dt, kt):
-
     print('-- Predicting the class membership')
 
     neg_one = tf.constant(-1.0, dtype=tf.float64)
@@ -128,7 +125,6 @@ def predict_class(xt, ct, dt, kt):
 # -------------------------------------------------------------------
 
 def plot_results(x0, x1, data_point, class_value):
-
     print('-- Plotting the results')
 
     plt.style.use('default')
@@ -149,8 +145,7 @@ def plot_results(x0, x1, data_point, class_value):
 # def main()
 # ------------------------------------------------------
 
-def main():
-
+def main(datapoint_x, datapoint_y, k_neighbors):
     # ------------------------------------------------------
     # -- Start of script run actions
     # ------------------------------------------------------
@@ -223,9 +218,39 @@ def main():
 # Run only if source file is run as the main script
 # ------------------------------------------------------
 
-if __name__ == '__main__':
+def require_input():
+    x = input("x = ")
+    y = input("y = ")
+    k = input("k = ")
+    return x, y, k
 
-    main()
+
+def print_menu():
+    print("Welcome to the kNN algorithm, this algorithm will \n" +
+          "calculate the k nearest neighbors of the coordinates you'll\n" +
+          "enter in the next step. The x represents the x coordinate, the y represents, \n" +
+          "the y coordinate and the k represents the amount of neighbors to check.\n" +
+          "The x and y can be of type integer or float, the k value must be of type integer.\n")
+
+    print("Please enter x, y and k:")
+    x, y, k = require_input()
+
+    while type(x) not in (int, float) or type(y) not in (int, float) or type(k) != int:
+        if "C" in (x, y, k):
+            sys.exit("Program aborted.")
+        try:
+            x = float(x)
+            y = float(y)
+            k = int(k)
+        except:
+            print("Unable to read the numbers you entered, please try again or enter C to cancel:")
+            x, y, k = require_input()
+    return x, y, k
+
+
+if __name__ == '__main__':
+    datapoint_x, datapoint_y, k_neighbors = print_menu()
+    main(datapoint_x=datapoint_x, datapoint_y=datapoint_y, k_neighbors=k_neighbors)
 
 # ------------------------------------------------------------------
 # End of script
