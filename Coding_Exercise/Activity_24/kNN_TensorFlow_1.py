@@ -254,8 +254,9 @@ def print_menu():
 
 if __name__ == '__main__':
     argsParser = argparse.ArgumentParser(description='k-nearest neighbours with tensorflow')
-    argsParser.add_argument("-x", metavar='<float>', type=float, required=False, help="The x value of x*a+y=z")
-    argsParser.add_argument("-y", metavar='<float>', type=float, required=False, help="The y value of x*a+y=z")
+    argsParser.add_argument("-x", metavar='<float>', type=float, required=False, help="The value on the horizontal "
+                                                                                      "axis.")
+    argsParser.add_argument("-y", metavar='<float>', type=float, required=False, help="The value on the vertical axis.")
     argsParser.add_argument("-k", metavar='<integer>', type=int, required=False, help="Amount of neighbors to check.")
     args = argsParser.parse_args()
 
