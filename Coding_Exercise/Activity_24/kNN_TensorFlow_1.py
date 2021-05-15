@@ -40,6 +40,11 @@ k_value_tf = tf.constant(3)
 # ------------------------------------------------------
 
 def create_data_points():
+    """Creates random datapoints to be used as the data to which the programs fits the to be examined datapoint to.
+
+    Returns:
+        (([(float, float)], [float], [(float, float)], [float])): Returns a tuple with 4 array. Wheres the first is the class0 (x,y) cooridnates, second is array with the amount of class0 points, the third is the class1 (x,y) cooridnates, the forth is an array with the amount of class1 points.
+    """
     print('-- Creating the data points')
 
     # Cluster 0 data points (x0) / Class 0 label (class_value0 = 0)
@@ -83,6 +88,14 @@ def create_test_point_to_classify():
 # -------------------------------------------------------------------
 
 def get_label(preds):
+    """Return which class the examined datapoint belongs to.
+
+    Args:
+        preds (tf.Tensor: shape=(k,), dtype=float64): An array containing the k neighrest neighbours classes.
+
+    Returns:
+        (tf.Tensor: shape=(), dtype=int64): The class to whom the examined datapoint belongs to.
+    """
     print('-- Obtaining the class label')
 
     counts = tf.math.bincount(tf.dtypes.cast(preds, tf.int32))
@@ -100,6 +113,17 @@ def get_label(preds):
 # -------------------------------------------------------------------
 
 def predict_class(xt, ct, dt, kt):
+    """This function calls the kNN algorithm.
+
+    Args:
+        xt (tf.Tensor: shape=(n, 2), dtype=float64): An array containing n points that should be used for fitting.
+        ct (tf.Tensor: shape=(n,), dtype=float64):   An array that describes which datapoints is in which class.
+        dt (tf.Tensor: shape=(2,), dtype=float64):   The datapoint that shell be examined.
+        kt (tf.Tensor: shape=(), dtype=int32):       How many neighbours should be considered.
+
+    Returns:
+        (tf.Tensor: shape=(kt,), dtype=float64): An array with the classes of the neighrest k neibours.
+    """
     print('-- Predicting the class membership')
 
     neg_one = tf.constant(-1.0, dtype=tf.float64)
@@ -128,6 +152,14 @@ def predict_class(xt, ct, dt, kt):
 # -------------------------------------------------------------------
 
 def plot_results(x0, x1, data_point, class_value):
+    """Plots all the datapoints and the given datapoint, colorcoding them by class and adds a legend.
+
+    Args:
+        x0 ([(float, float)]): Points of the class1 members.
+        x1 ([(float, float)]): Points of the class2 members.
+        data_point ((x, y)):   The classified datapoint.
+        class_value (string):  The class to whom the data_point belongs to.
+    """
     print('-- Plotting the results')
 
     plt.style.use('default')
@@ -149,6 +181,13 @@ def plot_results(x0, x1, data_point, class_value):
 # ------------------------------------------------------
 
 def main(datapoint_x, datapoint_y, k_neighbors):
+    """This function predicts where the (x, y) points should be classified to in regards to k neighbours.
+
+    Args:
+        datapoint_x (float): x coordinate of the point.
+        datapoint_y (float): y coordinate of the point.
+        k_neighbors (int):   For how many neighbours should the kNN search for.
+    """
     # ------------------------------------------------------
     # -- Start of script run actions
     # ------------------------------------------------------
@@ -222,6 +261,10 @@ def main(datapoint_x, datapoint_y, k_neighbors):
 # ------------------------------------------------------
 
 def require_input():
+    """Asks the user for x, y, k values.
+
+    Returns: (x, y, z): The parsed x, y, z values.
+    """
     x = input("x = ")
     y = input("y = ")
     k = input("k = ")
@@ -229,6 +272,10 @@ def require_input():
 
 
 def print_menu():
+    """Prints a user-friends menu and asks the user for x, y, k values.
+
+    Returns: (x, y, z): The parsed x, y, z values.
+    """
     print("Welcome to the kNN algorithm, this algorithm will \n" +
           "calculate the k nearest neighbors of the coordinates you'll\n" +
           "enter in the next step. The x represents the x coordinate, the y represents, \n" +
@@ -238,6 +285,7 @@ def print_menu():
     print("Please enter x, y and k:")
     x, y, k = require_input()
 
+    """Checks that the given inputs are valid types"""
     while type(x) not in (int, float) or type(y) not in (int, float) or type(k) != int:
         if "C" in (x, y, k):
             sys.exit("Program aborted.")
@@ -252,6 +300,10 @@ def print_menu():
 
 
 if __name__ == '__main__':
+    """
+    On application startup, first we check if any parameters are given. If so, we'll try to parse them.
+    If no arguments are given, the program starts a menu which will ask the user for the necessary inputs.
+    """
     argsParser = argparse.ArgumentParser(description='k-nearest neighbours with tensorflow')
     argsParser.add_argument("-x", metavar='<float>', type=float, required=False, help="The x value of x*a+y=z")
     argsParser.add_argument("-y", metavar='<float>', type=float, required=False, help="The y value of x*a+y=z")
@@ -262,7 +314,8 @@ if __name__ == '__main__':
     for arg in vars(args):
         argCnt += 0 if getattr(args, arg) is None else 1
 
-    if (argCnt == 0):
+    """If the parameters given are not equal to 3 (corresponding to x, y, k), the program starts the menu, otherwise the program proceeds to execute the main function."""
+    if (argCnt == 3):
         datapoint_x, datapoint_y, k_neighbors = print_menu()
     else:
         datapoint_x = args.x
@@ -270,7 +323,6 @@ if __name__ == '__main__':
         datapoint_k = args.k
 
     main(datapoint_x=datapoint_x, datapoint_y=datapoint_y, k_neighbors=k_neighbors)
-    print("done")
 
 # ------------------------------------------------------------------
 # End of script
