@@ -41,8 +41,9 @@ num_points_cluster0 = num_points_cluster1 = 100
 def create_data_points():
     """Creates random datapoints to be used as the data to which the programs fits the to be examined datapoint to.
 
-    Returns:
-        (([(float, float)], [float], [(float, float)], [float])): Returns a tuple with 4 array. Wheres the first is the class0 (x,y) cooridnates, second is array with the amount of class0 points, the third is the class1 (x,y) cooridnates, the forth is an array with the amount of class1 points.
+    Returns: (([(float, float)], [float], [(float, float)], [float])): Returns a tuple with 4 array. Wheres the first
+    is the class0 (x,y) coordinates, second is array with the amount of class0 points, the third is the class1 (x,
+    y) coordinates, the forth is an array with the amount of class1 points.
     """
     print('-- Creating the data points')
 
@@ -77,8 +78,8 @@ def create_point_to_classify(datapoint_x, datapoint_y):
         datapoint_x (float): The x coordinate of the datapoint.
         datapoint_y (float): The y coordinate of the datapoint.
 
-    Returns:
-        ([float], tf.Tensor: shape=(2,), dtype=float64): Returns a tuple containing the parsed [x, y] point and a Tensor representation of sayed point.
+    Returns: ([float], tf.Tensor: shape=(2,), dtype=float64): Returns a tuple containing the parsed [x, y] point and
+    a Tensor representation of saved point.
     """
     print('-- Creating a test point to classify')
     data_point = np.array([datapoint_x, datapoint_y])
@@ -94,7 +95,7 @@ def get_label(preds):
     """Return which class the examined datapoint belongs to.
 
     Args:
-        preds (tf.Tensor: shape=(k,), dtype=float64): An array containing the k neighrest neighbours classes.
+        preds (tf.Tensor: shape=(k,), dtype=float64): An array containing the k nearest neighbours classes.
 
     Returns:
         (tf.Tensor: shape=(), dtype=int64): The class to whom the examined datapoint belongs to.
@@ -125,7 +126,7 @@ def predict_class(xt, ct, dt, kt):
         kt (tf.Tensor: shape=(), dtype=int32):       How many neighbours should be considered.
 
     Returns:
-        (tf.Tensor: shape=(kt,), dtype=float64): An array with the classes of the neighrest k neibours.
+        (tf.Tensor: shape=(kt,), dtype=float64): An array with the classes of the nearest k neighbours.
     """
     print('-- Predicting the class membership')
 
@@ -155,7 +156,7 @@ def predict_class(xt, ct, dt, kt):
 # -------------------------------------------------------------------
 
 def plot_results(x0, x1, data_point, class_value):
-    """Plots all the datapoints and the given datapoint, colorcoding them by class and adds a legend.
+    """Plots all the datapoints and the given datapoint, color-coding them by class and adds a legend.
 
     Args:
         x0 ([(float, float)]): Points of the class1 members.
@@ -273,7 +274,8 @@ def require_input():
 
 
 def print_menu():
-    """Prints a menu for the user to choose the values of the test data point, as well as set the amount of nearest neighbors.
+    """Prints a menu for the user to choose the values of the test data point, as well as set the amount of nearest
+    neighbors.
 
     Returns: (x, y, z): The parsed x, y, z values.
     """
@@ -326,9 +328,10 @@ if __name__ == '__main__':
     for arg in vars(args):
         argCnt += 0 if getattr(args, arg) is None else 1
 
-    """If the parameters given are not equal to 3 (corresponding to x, y, k), the program starts the menu, otherwise the program proceeds to execute the main function."""
-    if (argCnt != 3):
-        datapoint_x, datapoint_y, k_neighbors = print_menu()
+    """If the parameters given are not equal to 3 (corresponding to x, y, k), the program starts the menu, 
+    otherwise the program proceeds to execute the main function. """
+    if argCnt != 3:
+        input_datapoint_x, input_datapoint_y, input_k_neighbors = print_menu()
     else:
         input_datapoint_x = args.x
         input_datapoint_y = args.y
