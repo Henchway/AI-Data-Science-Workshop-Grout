@@ -10,8 +10,6 @@
 # ------------------------------------------------------
 
 import argparse
-import tensorflow as tf
-import time
 import sys
 import time
 
@@ -24,7 +22,8 @@ import tensorflow as tf
 # Global variables
 # ------------------------------------------------------
 
-k_value_tf = tf.constant(3)
+k_value_tf = None
+num_points_cluster0 = num_points_cluster1 = 100
 
 
 # ------------------------------------------------------
@@ -48,14 +47,12 @@ def create_data_points():
     print('-- Creating the data points')
 
     # Cluster 0 data points (x0) / Class 0 label (class_value0 = 0)
-    num_points_cluster0 = 100
     mu0 = [-0.5, 5]
     covar0 = [[1.5, 0], [0, 1]]
     x0 = np.random.multivariate_normal(mu0, covar0, num_points_cluster0)
     class_value0 = np.zeros(num_points_cluster0)
 
     # Cluster 1 data points (x1) / Class 1 label (class_value1= 1)
-    num_points_cluster1 = 100
     mu1 = [0.5, 0.75]
     covar1 = [[2.5, 1.5], [1.5, 2.5]]
     x1 = np.random.multivariate_normal(mu1, covar1, num_points_cluster1)
@@ -73,13 +70,19 @@ def create_data_points():
 # def create_test_point_to_classify()
 # ------------------------------------------------------
 
-def create_test_point_to_classify():
+def create_point_to_classify(datapoint_x, datapoint_y):
+    """The function parses a x, y coordinate to be a tensorflow compatible type.
+
+    Args:
+        datapoint_x (float): The x coordinate of the datapoint.
+        datapoint_y (float): The y coordinate of the datapoint.
+
+    Returns:
+        ([float], tf.Tensor: shape=(2,), dtype=float64): Returns a tuple containing the parsed [x, y] point and a Tensor representation of sayed point.
+    """
     print('-- Creating a test point to classify')
-
-    data_point = np.array([((np.random.random_sample() * 10) - 5), ((np.random.random_sample() * 10) - 3)])
-
+    data_point = np.array([datapoint_x, datapoint_y])
     data_point_tf = tf.constant(data_point)
-
     return data_point, data_point_tf
 
 
@@ -179,14 +182,12 @@ def plot_results(x0, x1, data_point, class_value):
 # ------------------------------------------------------
 # def main()
 # ------------------------------------------------------
-
-def main(datapoint_x, datapoint_y, k_neighbors):
+def main(datapoint_x, datapoint_y):
     """This function predicts where the (x, y) points should be classified to in regards to k neighbours.
 
     Args:
         datapoint_x (float): x coordinate of the point.
         datapoint_y (float): y coordinate of the point.
-        k_neighbors (int):   For how many neighbours should the kNN search for.
     """
     # ------------------------------------------------------
     # -- Start of script run actions
@@ -211,7 +212,7 @@ def main(datapoint_x, datapoint_y, k_neighbors):
     # ------------------------------------------------------
 
     (x0, class_value0, x1, class_value1) = create_data_points()
-    (data_point, data_point_tf) = create_test_point_to_classify()
+    (data_point, data_point_tf) = create_point_to_classify(datapoint_x, datapoint_y)
 
     x = np.vstack((x0, x1))
     class_value = np.hstack((class_value0, class_value1))
@@ -272,7 +273,7 @@ def require_input():
 
 
 def print_menu():
-    """Prints a user-friends menu and asks the user for x, y, k values.
+    """Prints a menu for the user to choose the values of the test data point, as well as set the amount of nearest neighbors.
 
     Returns: (x, y, z): The parsed x, y, z values.
     """
@@ -293,10 +294,20 @@ def print_menu():
             x = float(x)
             y = float(y)
             k = int(k)
-        except:
+        except ValueError:
             print("Unable to read the numbers you entered, please try again or enter C to cancel:")
             x, y, k = require_input()
     return x, y, k
+
+
+def validate_k(k):
+    """Validates that k is greater than 0, not larger than the overall data set and that it is not even to disallow
+    an equal amount of class 1 and class 2 nearest neighbors """
+    if k < 1 or k > (num_points_cluster0 + num_points_cluster1):
+        raise ValueError(f"k must be > 0 and <= {num_points_cluster0 + num_points_cluster1}.")
+
+    if k % 2 == 0:
+        raise ValueError(f"k should not be even.")
 
 
 if __name__ == '__main__':
@@ -305,8 +316,9 @@ if __name__ == '__main__':
     If no arguments are given, the program starts a menu which will ask the user for the necessary inputs.
     """
     argsParser = argparse.ArgumentParser(description='k-nearest neighbours with tensorflow')
-    argsParser.add_argument("-x", metavar='<float>', type=float, required=False, help="The x value of x*a+y=z")
-    argsParser.add_argument("-y", metavar='<float>', type=float, required=False, help="The y value of x*a+y=z")
+    argsParser.add_argument("-x", metavar='<float>', type=float, required=False,
+                            help="The value on the horizontal axis.")
+    argsParser.add_argument("-y", metavar='<float>', type=float, required=False, help="The value on the vertical axis.")
     argsParser.add_argument("-k", metavar='<integer>', type=int, required=False, help="Amount of neighbors to check.")
     args = argsParser.parse_args()
 
@@ -315,14 +327,16 @@ if __name__ == '__main__':
         argCnt += 0 if getattr(args, arg) is None else 1
 
     """If the parameters given are not equal to 3 (corresponding to x, y, k), the program starts the menu, otherwise the program proceeds to execute the main function."""
-    if (argCnt == 3):
+    if (argCnt != 3):
         datapoint_x, datapoint_y, k_neighbors = print_menu()
     else:
-        datapoint_x = args.x
-        datapoint_y = args.y
-        datapoint_k = args.k
+        input_datapoint_x = args.x
+        input_datapoint_y = args.y
+        input_k_neighbors = args.k
 
-    main(datapoint_x=datapoint_x, datapoint_y=datapoint_y, k_neighbors=k_neighbors)
+    validate_k(input_k_neighbors)
+    k_value_tf = tf.constant(input_k_neighbors)
+    main(datapoint_x=input_datapoint_x, datapoint_y=input_datapoint_y)
 
 # ------------------------------------------------------------------
 # End of script
