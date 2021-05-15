@@ -23,6 +23,7 @@ import tensorflow as tf
 # ------------------------------------------------------
 
 k_value_tf = None
+num_points_cluster0 = num_points_cluster1 = 100
 
 
 # ------------------------------------------------------
@@ -40,15 +41,15 @@ k_value_tf = None
 def create_data_points():
     print('-- Creating the data points')
 
-    # Cluster 0 data points (x0) / Class 0 label (class_value0 = 0)
-    num_points_cluster0 = 100
+    #     # Cluster 0 data points (x0) / Class 0 label (class_value0 = 0)
+    # num_points_cluster0 = 100
     mu0 = [-0.5, 5]
     covar0 = [[1.5, 0], [0, 1]]
     x0 = np.random.multivariate_normal(mu0, covar0, num_points_cluster0)
     class_value0 = np.zeros(num_points_cluster0)
 
     # Cluster 1 data points (x1) / Class 1 label (class_value1= 1)
-    num_points_cluster1 = 100
+    # num_points_cluster1 = 100
     mu1 = [0.5, 0.75]
     covar1 = [[2.5, 1.5], [1.5, 2.5]]
     x1 = np.random.multivariate_normal(mu1, covar1, num_points_cluster1)
@@ -68,10 +69,8 @@ def create_data_points():
 
 def create_test_point_to_classify(datapoint_x, datapoint_y):
     print('-- Creating a test point to classify')
-
     data_point = np.array([datapoint_x, datapoint_y])
     data_point_tf = tf.constant(data_point)
-
     return data_point, data_point_tf
 
 
@@ -252,6 +251,16 @@ def print_menu():
     return x, y, k
 
 
+def validate_k(k):
+    """Validates that k is greater than 0, not larger than the overall data set and that it is not even to disallow
+    an equal amount of class 1 and class 2 nearest neighbors """
+    if k < 1 or k > (num_points_cluster0 + num_points_cluster1):
+        raise ValueError(f"k must be > 0 and <= {num_points_cluster0 + num_points_cluster1}.")
+
+    if k % 2 == 0:
+        raise ValueError(f"k should not be even.")
+
+
 if __name__ == '__main__':
     argsParser = argparse.ArgumentParser(description='k-nearest neighbours with tensorflow')
     argsParser.add_argument("-x", metavar='<float>', type=float, required=False,
@@ -271,9 +280,7 @@ if __name__ == '__main__':
         input_datapoint_y = args.y
         input_k_neighbors = args.k
 
-    if input_k_neighbors < 1:
-        sys.exit("k must be > 0")
-
+    validate_k(input_k_neighbors)
     k_value_tf = tf.constant(input_k_neighbors)
     main(datapoint_x=input_datapoint_x, datapoint_y=input_datapoint_y)
 
