@@ -2,7 +2,7 @@
 # Filename:    kNN_TensorFlow_1.py
 # ------------------------------------------------------------------
 # File description:
-# Python and TensorFlow image classification using the MNIST dataset.
+# Python and TensorFlow k-nearest neighbors algorithm.
 # ------------------------------------------------------------------
 
 # ------------------------------------------------------
